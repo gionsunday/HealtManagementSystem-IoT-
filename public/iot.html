@@ -1,19 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>ESP32 Data</title>
-  <script>
-    async function fetchData() {
-      const res = await fetch("https://your-ngrok-id.ngrok.io/");
-      const text = await res.text();
-      document.getElementById("data").innerHTML = text;
-    }
-
-    setInterval(fetchData, 5000); // refresh every 5s
-  </script>
-</head>
-<body>
-  <!--
+<!--
   ESP32 IoT Project - Landing Page
   - Replace API_URL with your deployed Node.js endpoint that returns JSON like:
     { "value": "37.1", "unit": "°C", "timestamp": "2025-08-12T10:00:00Z" }
@@ -232,8 +217,5 @@
 
     refreshBtn.addEventListener('click', fetchLatest);
   </script>
-</body>
-</html>
-
 </body>
 </html>
