@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ESP32 Data</title>
+  <script>
+    async function fetchData() {
+      const res = await fetch("https://your-ngrok-id.ngrok.io/");
+      const text = await res.text();
+      document.getElementById("data").innerHTML = text;
+    }
+
+    setInterval(fetchData, 5000); // refresh every 5s
+  </script>
+</head>
+<body>
+  <div id="data">Loading...
+    <p>
+      No data Available!
+    </p>
+  </div>
+</body>
+</html>
