@@ -6,7 +6,7 @@ window.addEventListener("load", () =>{
     try {
       const response = await fetch(API_URL);
       const data = await response.json();
-      document.getElementById("temp").innerText = `${data.value} ${data.unit}`;
+      document.getElementById("value").innerText = `${data.value} ${data.unit}`;
     } catch (err) {
       console.error("Error fetching temperature:", err);
     }

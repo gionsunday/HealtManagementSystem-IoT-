@@ -2,88 +2,24 @@
 <html>
 <head>
   <title>ESP32 Data</title>
-  <script>
-    async function fetchData() {
-      const res = await fetch("https://your-ngrok-id.ngrok.io/");
-      const text = await res.text();
-      document.getElementById("data").innerHTML = text;
-    }
-
-    setInterval(fetchData, 5000); // refresh every 5s
-  </script>
+ 
   <script src="https://cdn.jsdelivr.net/npm/axios@0.21.1/dist/axios.min.js"></script>
-</head>
-<body>
-  <!--
-  ESP32 IoT Project - Landing Page
-  - Replace API_URL with your deployed Node.js endpoint that returns JSON like:
-    { "value": "37.1", "unit": "°C", "timestamp": "2025-08-12T10:00:00Z" }
-  - This is a single-file landing page (HTML + CSS + JS) you can drop on any static host.
--->
+  <link rel="stylesheet" href="style.css">
 
-<!doctype html>
-<html lang="en">
-<head>
+
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Wearable Health — Live IoT Monitoring</title>
   <meta name="description" content="Real-time body temperature monitoring with ESP32 — view live readings, history, and device status." />
- <link rel="stylesheet" href="style.css">
+ 
 </head>
 <body>
   <div class="container">
     <div class="hero">
-      <div>
-        <!-- <div class="brand">
-          <div class="logo">WH</div>
-          <div>
-            <h1>Wearable Health — Live IoT Monitoring</h1>
-            <p class="lead">Real-time body-temperature monitoring from ESP32 devices. Secure, cloud-ready, and accessible anywhere.</p>
-          </div>
-        </div> -->
-
-        <!-- <div style="height:18px"></div>
-
-        <div class="card">
-          <h2 style="margin:0 0 8px 0">Overview</h2>
-          <p class="muted">This project streams live body temperature readings from an ESP32-connected wearable to a Node.js backend. Visitors can view up-to-date readings, history, and device status from any browser.</p>
-
-          <div class="grid">
-            <div class="feature">
-              <strong>Real-time</strong>
-              <h3>Live readings</h3>
-              <p>Pushes data via HTTP to your cloud backend. Use WebSockets for instant updates.</p>
-            </div>
-            <div class="feature">
-              <strong>Secure</strong>
-              <h3>Deployable</h3>
-              <p>Works with Render, Railway, or Firebase for 24/7 availability.</p>
-            </div>
-            <div class="feature">
-              <strong>Compact</strong>
-              <h3>Wearable-ready</h3>
-              <p>Small sensors like MAX30205 + ESP32-PICO fit in wearable enclosures.</p>
-            </div>
-          </div>
-        </div> -->
-
-        <!-- <div style="height:12px"></div>
-
-        <div class="card" style="margin-top:12px">
-          <h3 style="margin:0 0 8px 0">How it works</h3>
-          <ol style="color:var(--muted);margin:0;padding-left:18px">
-            <li>ESP32 connects to Wi‑Fi and posts sensor data to your Node.js endpoint.</li>
-            <li>Node server stores latest value and optional history (DB).</li>
-            <li>Frontend fetches the latest value and displays to visitors.</li>
-          </ol>
-        </div> -->
-      <!-- </div> -->
-
       <div class="right">
-        
         <div class="card live">
             <div
-             style="padding: 40px 0px 40px 0px;">
+             style="padding: 40px 0px 40px 0px; text-align: center;">
             <h1>Wearable Health — Live IoT Monitoring</h1>
             <p class="lead">Real-time body-temperature monitoring from ESP32 devices. Secure, cloud-ready, and accessible anywhere.</p>
           </div>
@@ -115,21 +51,73 @@
 
         <div style="height:12px"></div>
 
-        <div class="card">
+        <!-- <div class="card">
           <h3 style="margin:0 0 8px 0">Quick links</h3>
           <p class="muted" style="margin:0">Replace <code>API_URL</code> in the script with your deployed server endpoint. The endpoint should return JSON: <code>{"value":"37.1","unit":"°C","timestamp":"2025-08-12T10:00:00Z"}</code></p>
-        </div>
-      </div>
+        </div> -->
+    </div>
     </div>
 
-    <footer>
+    <!-- <footer>
       Built for ESP32 telemetry • <span id="now">&copy; 2025</span>
-    </footer>
+    </footer> -->
   </div>
 
-  
+  <script>
+    // ===== CONFIGURE THIS =====
+    const API_URL = "https://healthmanagementsystem-iot.onrender.com/temp"; // <-- replace with your endpoint
+    const POLL_INTERVAL = 5000; // ms
 
+    // ===== state =====
+    const history = [];
+    const historyEl = document.getElementById('history');
+    const valueEl = document.getElementById('value');
+    const tsEl = document.getElementById('timestamp');
+    const statusEl = document.getElementById('status');
+    const refreshBtn = document.getElementById('refresh');
 
+    async function fetchLatest(){
+      try{
+        statusEl.textContent = 'Updating...';
+        const res = await fetch(API_URL, {cache: 'no-store'});
+        if(!res.ok) throw new Error('HTTP '+res.status);
+        const data = await res.json();
+        // Expected: { value: "37.1", unit: "°C", timestamp: "..." }
+        const v = data.value ?? data.temp ?? data.temperature ?? '--';
+        const unit = data.unit ?? '°C';
+        const t = data.timestamp ?? new Date().toISOString();
+
+        valueEl.textContent = `${v} ${unit}`;
+        tsEl.textContent = new Date(t).toLocaleString();
+        statusEl.textContent = 'Online';
+
+        // push to history
+        history.unshift({v, unit, t});
+        if(history.length>12) history.pop();
+        renderHistory();
+      }catch(err){
+        console.error(err);
+        statusEl.textContent = 'Error fetching';
+      }
+    }
+
+    function renderHistory(){
+      if(history.length===0){
+        historyEl.innerHTML = '<div class="row"><div>Waiting for readings...</div><div></div></div>';
+        return;
+      }
+      historyEl.innerHTML = history.map(h=>{
+        const local = new Date(h.t).toLocaleTimeString();
+        return `<div class=\"row\"><div>${h.v} ${h.unit}</div><div>${local}</div></div>`;
+      }).join('');
+    }
+
+    // initial fetch
+    fetchLatest();
+    const timer = setInterval(fetchLatest, POLL_INTERVAL);
+
+    refreshBtn.addEventListener('click', fetchLatest);
+  </script>
   <script src="index.js"></script>
 </body>
 </html>

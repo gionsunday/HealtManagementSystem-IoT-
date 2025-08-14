@@ -32,10 +32,11 @@
  /* Header / Hero */
  .hero {
      display: grid;
-     grid-template-columns: 1fr 420px;
+     /* grid-template-columns: 1fr 420px; */
      gap: 28px;
      align-items: center;
-     margin-bottom: 28px
+     margin-bottom: 28px;
+     justify-items: center;
  }
 
  .brand {
@@ -43,7 +44,9 @@
      align-items: center;
      gap: 14px
  }
-
+.hero > :nth-child(2) {
+    justify-self: center;
+}
  .logo {
      width: 56px;
      height: 56px;
@@ -78,6 +81,10 @@
 
  .right .card {
      padding: 20px
+ }
+ .right{
+    position: relative;
+    display:flex;
  }
 
  /* live panel */
