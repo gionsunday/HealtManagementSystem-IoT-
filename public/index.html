@@ -28,58 +28,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Wearable Health — Live IoT Monitoring</title>
   <meta name="description" content="Real-time body temperature monitoring with ESP32 — view live readings, history, and device status." />
-  <style>
-    :root{
-      --bg:#0f1724; --card:#0b1320; --accent:#4fd1c5; --muted:#9aa7b2; --glass: rgba(255,255,255,0.04);
-      --max-width:1100px;
-      --radius:14px;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;background:linear-gradient(180deg,#071022 0%,var(--bg) 100%);color:#e6eef6;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px}
-    .container{width:100%;max-width:var(--max-width)}
-
-    /* Header / Hero */
-    .hero{display:grid;grid-template-columns:1fr 420px;gap:28px;align-items:center;margin-bottom:28px}
-    .brand{display:flex;align-items:center;gap:14px}
-    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#2bcbaf);display:flex;align-items:center;justify-content:center;font-weight:700;color:#052023}
-    h1{margin:0;font-size:28px;line-height:1.05}
-    p.lead{color:var(--muted);margin-top:10px;margin-bottom:0}
-
-    /* Cards */
-    .card{background:linear-gradient(180deg,var(--card), rgba(255,255,255,0.02));padding:18px;border-radius:var(--radius);box-shadow:0 6px 30px rgba(2,8,23,0.6);}
-    .right .card{padding:20px}
-
-    /* live panel */
-    .live{display:flex;flex-direction:column;gap:12px}
-    .value{font-size:44px;font-weight:700;color:var(--accent)}
-    .meta{color:var(--muted);font-size:13px}
-
-    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
-    .feature{padding:14px;border-radius:12px;background:var(--glass);border:1px solid rgba(255,255,255,0.02)}
-    .feature h3{margin:6px 0 0 0;font-size:14px}
-    .feature p{margin:6px 0 0 0;color:var(--muted);font-size:13px}
-
-    /* history */
-    .history{margin-top:12px;max-height:160px;overflow:auto;padding:8px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.014), transparent)}
-    .history .row{display:flex;justify-content:space-between;padding:8px;border-bottom:1px dashed rgba(255,255,255,0.02);font-size:13px}
-
-    /* footer */
-    footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
-
-    /* responsive */
-    @media (max-width:900px){
-      .hero{grid-template-columns:1fr}
-      .grid{grid-template-columns:repeat(2,1fr)}
-    }
-    @media (max-width:560px){
-      .grid{grid-template-columns:1fr}
-      .value{font-size:36px}
-    }
-    /* tiny helper */
-    .muted{color:var(--muted);font-size:13px}
-    .btn{display:inline-block;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.03);cursor:pointer}
-  </style>
+ <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
@@ -178,61 +127,9 @@
     </footer>
   </div>
 
-  <script>
-    // ===== CONFIGURE THIS =====
-    const API_URL = "/temp"; // <-- replace with your endpoint
-    const POLL_INTERVAL = 5000; // ms
+  
 
-    // ===== state =====
-    const history = [];
-    const historyEl = document.getElementById('history');
-    const valueEl = document.getElementById('value');
-    const tsEl = document.getElementById('timestamp');
-    const statusEl = document.getElementById('status');
-    const refreshBtn = document.getElementById('refresh');
 
-    async function fetchLatest(){
-      try{
-        statusEl.textContent = 'Updating...';
-        const res = await fetch(API_URL, {cache: 'no-store'});
-        if(!res.ok) throw new Error('HTTP '+res.status);
-        const data = await res.json();
-        // Expected: { value: "37.1", unit: "°C", timestamp: "..." }
-        const v = data.value ?? data.temp ?? data.temperature ?? '--';
-        const unit = data.unit ?? '°C';
-        const t = data.timestamp ?? new Date().toISOString();
-
-        valueEl.textContent = `${v} ${unit}`;
-        tsEl.textContent = new Date(t).toLocaleString();
-        statusEl.textContent = 'Online';
-
-        // push to history
-        history.unshift({v, unit, t});
-        if(history.length>12) history.pop();
-        renderHistory();
-      }catch(err){
-        console.error(err);
-        statusEl.textContent = 'Error fetching';
-      }
-    }
-
-    function renderHistory(){
-      if(history.length===0){
-        historyEl.innerHTML = '<div class="row"><div>Waiting for readings...</div><div></div></div>';
-        return;
-      }
-      historyEl.innerHTML = history.map(h=>{
-        const local = new Date(h.t).toLocaleTimeString();
-        return `<div class=\"row\"><div>${h.v} ${h.unit}</div><div>${local}</div></div>`;
-      }).join('');
-    }
-
-    // initial fetch
-    fetchLatest();
-    const timer = setInterval(fetchLatest, POLL_INTERVAL);
-
-    refreshBtn.addEventListener('click', fetchLatest);
-  </script>
   <script src="index.js"></script>
 </body>
 </html>

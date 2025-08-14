@@ -1,11 +1,18 @@
 window.addEventListener("load", () =>{
-    const postData = async () =>{
-        try {
-            const data = await axios.post("/temp")
-            console.log(data)
-        } catch (error) {
-            console.log(error)
-        }
+  
+  const API_URL = "https://healthmanagementsystem-iot.onrender.com/temp";
+
+  async function fetchTemperature() {
+    try {
+      const response = await fetch(API_URL);
+      const data = await response.json();
+      document.getElementById("temp").innerText = `${data.value} ${data.unit}`;
+    } catch (err) {
+      console.error("Error fetching temperature:", err);
     }
-    postData()
+  }
+
+  setInterval(fetchTemperature, 5000); // fetch every 5s
+  fetchTemperature();
+
 })
