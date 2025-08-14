@@ -11,6 +11,7 @@
 
     setInterval(fetchData, 5000); // refresh every 5s
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/axios@0.21.1/dist/axios.min.js"></script>
 </head>
 <body>
   <!--
@@ -179,7 +180,7 @@
 
   <script>
     // ===== CONFIGURE THIS =====
-    const API_URL = "https://your-deployed-server.example.com/latest"; // <-- replace with your endpoint
+    const API_URL = "/temp"; // <-- replace with your endpoint
     const POLL_INTERVAL = 5000; // ms
 
     // ===== state =====
@@ -232,6 +233,7 @@
 
     refreshBtn.addEventListener('click', fetchLatest);
   </script>
+  <script src="index.js"></script>
 </body>
 </html>
 

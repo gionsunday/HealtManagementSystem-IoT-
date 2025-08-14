@@ -94,6 +94,18 @@ app.get("/", (req, res) => {
   });
 });
 
+app.post("/temp", (req, res) => {
+    latestTemp = req.body.temperature;
+    console.log(`Temperature received: ${latestTemp}°C`);
+
+    // Example: Send email if temp > 30°C
+    if (latestTemp > 30) {
+        sendAlertEmail(latestTemp);
+    }
+
+    res.json({ message: "Temperature received" });
+});
+
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
