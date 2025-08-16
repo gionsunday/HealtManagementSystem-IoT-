@@ -52,8 +52,7 @@ window.addEventListener('load', () =>{
       console.error(err);
       statusEl.textContent = 'Error fetching';
       valueEl.textContent = "Device Offline";
-      valueEl.style.color = "crimson"
-      valueEl.style.fontSize = "20px"
+      
       tsEl.textContent = "N/A";
 
       // Log error as offline event
