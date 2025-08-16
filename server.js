@@ -23,6 +23,7 @@ let latestData = {
 let lastAlertState = null; // "low", "high", "normal", or null
 let lastEmailTime = 0;
 const ALERT_COOLDOWN = 5 * 60 * 1000; // 5 minutes
+let alertActive = false;
 
 // Route to receive ESP32 data (generic)
 app.post("/update", (req, res) => {
@@ -38,6 +39,8 @@ app.post("/update", (req, res) => {
   console.log("Received from ESP32:", latestData);
   res.json({ message: "Data received", data: latestData });
 });
+
+
 
 // Route specifically for temperature from ESP32
 app.post("/temp", (req, res) => {
