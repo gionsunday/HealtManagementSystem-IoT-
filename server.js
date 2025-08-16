@@ -58,10 +58,28 @@ app.post("/temp", (req, res) => {
 
 // Route to let frontend fetch the latest data
 app.get("/temp", (req, res) => {
-  if (!latestData.value) {
-    return res.status(404).json({ error: "No data yet" });
+  if (!latestData || !latestData.value) {
+    return res.status(503).json({
+      status: "offline",
+      message: "System offline: No temperature data available"
+    });
   }
-  res.json(latestData);
+
+  const temp = latestData.value;
+
+  // Define abnormal thresholds
+  const lowThreshold = 35.0;
+  const highThreshold = 38.0;
+
+  if (temp < lowThreshold || temp > highThreshold) {
+    sendAlertEmail(temp);
+  }
+
+  res.json({
+    status: "online",
+    temperature: temp,
+    unit: "°C"
+  });
 });
 
 function sendAlertEmail(temp) {
@@ -73,11 +91,22 @@ function sendAlertEmail(temp) {
     }
   });
 
+  let recommendation = "";
+  if (temp < 35.0) {
+    recommendation = "Temperature is too low. Risk of hypothermia. Seek warmth and medical attention if persistent.";
+  } else if (temp > 38.0) {
+    recommendation = "Temperature is too high. Possible fever. Stay hydrated and consult a doctor if it persists.";
+  }
+
   const EmailMessage = {
     from: process.env.NEW_E,
     to: process.env.ALERT_EMAIL || "recipient@example.com",
     subject: `Temperature Alert: ${temp}°C`,
-    html: `<p>Alert! The temperature is ${temp}°C.</p>`
+    html: `
+      <h3>⚠️ Temperature Alert!</h3>
+      <p>The current measured temperature is <strong>${temp}°C</strong>.</p>
+      <p><strong>Recommendation:</strong> ${recommendation}</p>
+    `
   };
 
   transporter.sendMail(EmailMessage, (error, info) => {
@@ -87,6 +116,7 @@ function sendAlertEmail(temp) {
     console.log("Alert email sent:", info.response);
   });
 }
+
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);

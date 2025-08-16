@@ -18,11 +18,13 @@
     <div class="hero">
       <div class="right">
         <div class="card live">
-            <div
-             style="padding: 40px 0px 40px 0px; text-align: center;">
+          <div style="padding: 40px 0px 40px 0px; text-align: center;">
             <h1>Wearable Health — Live IoT Monitoring</h1>
-            <p class="lead">Real-time body-temperature monitoring from ESP32 devices. Secure, cloud-ready, and accessible anywhere.</p>
+            <p class="lead">
+              Real-time body-temperature monitoring from ESP32 devices. Secure, cloud-ready, and accessible anywhere.
+            </p>
           </div>
+
           <div style="display:flex;justify-content:space-between;align-items:center">
             <div>
               <div class="meta">Device status</div>
@@ -50,74 +52,18 @@
         </div>
 
         <div style="height:12px"></div>
-
-        <!-- <div class="card">
-          <h3 style="margin:0 0 8px 0">Quick links</h3>
-          <p class="muted" style="margin:0">Replace <code>API_URL</code> in the script with your deployed server endpoint. The endpoint should return JSON: <code>{"value":"37.1","unit":"°C","timestamp":"2025-08-12T10:00:00Z"}</code></p>
-        </div> -->
+      </div>
     </div>
-    </div>
-
-    <!-- <footer>
-      Built for ESP32 telemetry • <span id="now">&copy; 2025</span>
-    </footer> -->
   </div>
 
-  <script>
-    // ===== CONFIGURE THIS =====
-    const API_URL = "https://healthmanagementsystem-iot.onrender.com/temp"; // <-- replace with your endpoint
-    const POLL_INTERVAL = 5000; // ms
+  <!-- History row styles -->
+  <style>
+    .row { display:flex; justify-content:space-between; padding:4px 0; }
+    .row.online { color: green; }
+    .row.offline { color: red; }
+  </style>
 
-    // ===== state =====
-    const history = [];
-    const historyEl = document.getElementById('history');
-    const valueEl = document.getElementById('value');
-    const tsEl = document.getElementById('timestamp');
-    const statusEl = document.getElementById('status');
-    const refreshBtn = document.getElementById('refresh');
-
-    async function fetchLatest(){
-      try{
-        statusEl.textContent = 'Updating...';
-        const res = await fetch(API_URL, {cache: 'no-store'});
-        if(!res.ok) throw new Error('HTTP '+res.status);
-        const data = await res.json();
-        // Expected: { value: "37.1", unit: "°C", timestamp: "..." }
-        const v = data.value ?? data.temp ?? data.temperature ?? '--';
-        const unit = data.unit ?? '°C';
-        const t = data.timestamp ?? new Date().toISOString();
-
-        valueEl.textContent = `${v} ${unit}`;
-        tsEl.textContent = new Date(t).toLocaleString();
-        statusEl.textContent = 'Online';
-
-        // push to history
-        history.unshift({v, unit, t});
-        if(history.length>12) history.pop();
-        renderHistory();
-      }catch(err){
-        console.error(err);
-        statusEl.textContent = 'Error fetching';
-      }
-    }
-
-    function renderHistory(){
-      if(history.length===0){
-        historyEl.innerHTML = '<div class="row"><div>Waiting for readings...</div><div></div></div>';
-        return;
-      }
-      historyEl.innerHTML = history.map(h=>{
-        const local = new Date(h.t).toLocaleTimeString();
-        return `<div class=\"row\"><div>${h.v} ${h.unit}</div><div>${local}</div></div>`;
-      }).join('');
-    }
-
-    // initial fetch
-    fetchLatest();
-    const timer = setInterval(fetchLatest, POLL_INTERVAL);
-
-    refreshBtn.addEventListener('click', fetchLatest);
-  </script>
+  <!-- External JS -->
   <script src="index.js"></script>
 </body>
 </html>
